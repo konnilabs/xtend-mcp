@@ -1,0 +1,21 @@
+services:
+  mcp:
+    build: .
+    ports: ["127.0.0.1:31415:31415"]
+    environment:
+      XTEND_MCP_TOKENS: ${XTEND_MCP_TOKENS:?Set a secret of at least 32 characters}
+      XTEND_ALLOWED_HOSTS: ${XTEND_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      XTEND_SOURCE_REF: ${XTEND_SOURCE_REF:-main}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+    volumes: ["knowledge:/data"]
+    read_only: true
+    tmpfs: ["/tmp:size=16m,noexec,nosuid"]
+    cap_drop: ["ALL"]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    cpus: 1
+    pids_limit: 64
+    restart: unless-stopped
+    stop_grace_period: 15s
+volumes:
+  knowledge:
