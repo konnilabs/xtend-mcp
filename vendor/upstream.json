@@ -1,0 +1,9 @@
+{
+  "repository": "konnilabs/xtend",
+  "commit": "c31e380f13dfb3b64456f2b149b504efe4d81dfa",
+  "path": "products/xtend-mcp/src/knowledge.mjs",
+  "localPath": "vendor/xtend-knowledge.mjs",
+  "sha256": "d6459c14062ba04c0d8ae2026bd77596f8da4082a3a82b9b293a2b980ded6857",
+  "license": "Apache-2.0",
+  "note": "Unmodified upstream retrieval module. Update only in a reviewed software change; never in the runtime knowledge sync."
+}
