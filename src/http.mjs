@@ -41,6 +41,9 @@ export function createHttpServer(config, store) {
       for await (const chunk of req) { size += chunk.length; if (size > config.maxBodyBytes) { reply(413,'body_too_large'); return; } chunks.push(chunk); }
       let body; try { body = JSON.parse(Buffer.concat(chunks).toString()); } catch { return reply(400,'invalid_json'); }
       if (Array.isArray(body)) return reply(400,'batch_not_supported');
+      // Preserve SDK request/response correlation: reject an ID that cannot fit
+      // even the bounded error envelope, rather than rewriting it in send().
+      if (typeof body?.id === 'string' && Buffer.byteLength(JSON.stringify(body.id)) > config.maxResponseBytes - 256) return reply(413,'request_id_too_large');
       lease = store.acquire(req.headers['x-xtend-snapshot']);
       res.setHeader('x-xtend-snapshot',lease.snapshot.commit);
       // Bound SDK output before any bytes leave the process.
@@ -50,7 +53,7 @@ export function createHttpServer(config, store) {
         if (Buffer.byteLength(JSON.stringify(message)) > config.maxResponseBytes) message = { jsonrpc:'2.0', id:message.id ?? null, error:{ code:-32603, message:'Response exceeds configured budget' } };
         return send(message, options);
       };
-      mcp = createKnowledgeServer(lease.snapshot);
+      mcp = createKnowledgeServer(lease.snapshot, { recipePageBytes: Math.min(config.recipePageBytes, config.maxResponseBytes - 1024) });
       await mcp.connect(transport);
       await transport.handleRequest(req,res,body);
     } catch { reply(503,'request_failed'); }

@@ -31,6 +31,7 @@ export function configFromEnv(env = process.env) {
     retainSnapshots: number(env, 'XTEND_RETAIN_SNAPSHOTS', 3, 2, 20),
     maxBodyBytes: number(env, 'XTEND_MAX_BODY_BYTES', 65536, 1024, 1024 * 1024),
     maxResponseBytes: number(env, 'XTEND_MAX_RESPONSE_BYTES', 1024 * 1024, 4096, 16 * 1024 * 1024),
+    recipePageBytes: number(env, 'XTEND_RECIPE_PAGE_BYTES', 65536, 4096, 1024 * 1024),
     requestTimeoutMs: number(env, 'XTEND_REQUEST_TIMEOUT_SECONDS', 10, 1, 60) * 1000,
     perKeyPerMinute: number(env, 'XTEND_REQUESTS_PER_KEY_MINUTE', 60, 1, 60000),
     perIpPerMinute: number(env, 'XTEND_REQUESTS_PER_IP_MINUTE', 120, 1, 60000),
