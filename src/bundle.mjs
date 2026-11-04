@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { createRecipeCatalog } from './recipes.mjs';
 
 export const KIT_FILES = Object.freeze([
   'rmt-ai-kit.compact.md', 'rmt-ai-kit.guardrails.json', 'rmt-ai-kit.manifest.json',
@@ -56,7 +57,9 @@ export function validateBundle(files) {
       ids.add(record.id);
     }
   }
-  return { manifest, docs, recipes, references, kitManifest };
+  // Prepared before atomic activation, and rebuilt identically during recovery.
+  const recipeCatalog = createRecipeCatalog(recipes);
+  return { manifest, docs, recipes, references, kitManifest, recipeCatalog };
 }
 
 // Verify freshness against actual canonical source blobs in the SAME Git tree.

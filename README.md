@@ -34,9 +34,13 @@ commit, ref, snapshot inventory and synchronization status. Without a valid snap
 `X-XTend-Snapshot` selects a retained commit for a request; the response header reports the chosen commit.
 A retained snapshot can eventually be evicted; unavailable selections fail rather than silently switching.
 
-Tools: `xtend_knowledge_search`, `xtend_knowledge_context`.
+Tools: `xtend_knowledge_search`, `xtend_knowledge_context`, `xtend_recipe_list`.
 Resources: paginated documentation listing and direct canonical documentation/kit URIs.
-Prompt: `xtend_recipe`, with stable recipe `id`; discover recipes with knowledge search.
+Prompt: `xtend_recipe`, with stable recipe `id`; discover recipes with `xtend_recipe_list` or knowledge search.
+The prompt list includes paginated legacy `xtendRmt_*` aliases. Recipe discovery returns summaries,
+not source code, with locale/topic filters and optional exact XTend/adapter target versions.
+Missing compatibility metadata remains explicitly unknown. See [the API proposal](docs/recipe-discovery.md)
+for cursor pinning, the additive metadata contract, error handling and validation evidence.
 Compiler, repair and workspace mutation tools are deliberately absent from this hosted profile.
 
 ## Knowledge updates
@@ -65,10 +69,15 @@ All are configurable using the named `XTEND_*` variables in `src/config.mjs`. Li
 application work; provider/proxy protection is needed for connection floods and network saturation.
 Never log access tokens. Shutdown aborts synchronization and closes HTTP connections.
 
+`XTEND_RECIPE_PAGE_BYTES` defaults to 64 KiB per serialized recipe-tool result or prompt list.
+The effective limit also reserves 1 KiB below `XTEND_MAX_RESPONSE_BYTES` for the JSON-RPC envelope;
+the existing transport guard remains the final bound. Catalogue pages default to 25 items and
+allow at most 100 per request. These are response budgets, never limits on stored recipe counts.
+
 ## Remaining acceptance work
 
 - Run container build and SDK-client integration through a real TLS reverse proxy; benchmark target hardware.
-- Add recipe catalogue filtering/pagination, existing per-recipe prompt aliases, compatibility metadata and explicit incompatibility behavior.
+- Populate optional locale/compatibility metadata in the canonical upstream recipe generator; the hosted catalogue and prompt handlers already accept and evaluate it without an image change.
 - Prove generated kit freshness using a successful upstream release/drift gate (source hashes alone do not prove generator freshness).
 - Add signed webhook triggering, stronger exponential backoff, rollback operations and exhaustive retention/crash tests.
 - Expand timeout, response budget, rate, forged-header, secret-redaction and resource-exhaustion tests.
